@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -165,7 +166,8 @@ class Postfix{
             }
         }
         void display(){
-            cout<<output<<endl;
+            cout<<output;
+            cout << endl;
         }
 };
 

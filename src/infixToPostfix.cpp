@@ -3,23 +3,23 @@
 #include <math.h>
 
 using namespace std;
-
+template <typename T>
 class Node{
     protected:
-        char data;
+        T data;
         Node *next;
     public:
-        Node(char data){
+        Node(T data){
             this->data = data;
         }
-        Node(char data, Node *next){
+        Node(T data, Node *next){
             this->data = data;
             this->next = next;
         }
-        void setData(char data){
+        void setData(T data){
             this->data = data;
         }
-        char getData(){
+        T getData(){
             return this->data;
         }
         void setNext(Node *next){
@@ -29,9 +29,11 @@ class Node{
             return this->next;
         }
 };
+
+template <typename T>
 class Stack{
     protected:
-            Node *top;
+            Node<T> *top;
             int size;
         public:
             Stack(){
@@ -94,7 +96,8 @@ class Stack{
 class Postfix{
     protected:
         string output;
-        Stack  *stack;
+        Stack<char>  *stack;
+        Stack<char>  *stack2;
         string vars;
         int precedence(char op){
             switch(op){
@@ -121,7 +124,6 @@ class Postfix{
         }
     public:
         Postfix(string infix){
-            this->stack = new Stack();
             for(int i=0; i<infix.size(); i++){
                 switch(infix[i]){
                     case '(':
@@ -129,6 +131,28 @@ class Postfix{
                         break;
                     case ')':
                         while(this->stack->head() != '(' && this->stack->head() != NULL){
+                            char c = this->stack->pop();
+                            output.append(1,c);
+                        }
+                        this->stack->pop();
+                        break;
+                    
+                    case '[':
+                        this->stack->push('(');
+                        break;
+                    case ']':
+                        while(this->stack->head() != '[' && this->stack->head() != NULL){
+                            char c = this->stack->pop();
+                            output.append(1,c);
+                        }
+                        this->stack->pop();
+                        break;
+                    
+                    case '{':
+                        this->stack->push('(');
+                        break;
+                    case '}':
+                        while(this->stack->head() != '}' && this->stack->head() != NULL){
                             char c = this->stack->pop();
                             output.append(1,c);
                         }
@@ -183,9 +207,19 @@ class Postfix{
                     return i;
                 }
             }
+            return -1;
+        }
+        char returnUnusedVar(int arr[]){
+            char characters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIKJLMNOPQRSTUVWXYZ";
+            for (int i = 0; i< this->vars.size(); i++){
+                if (findValue(arr,characters[i])){
+                    return characters[i];
+                }
+            }
+            return '!';
         }
         int evaluate(){
-            int arr[this->vars.size()];
+            int arr[this->vars.size()*2];
             int op1,op2,rslt;
             char c;
             for(int i = 0; i < this->vars.size(); i ++){
@@ -247,7 +281,7 @@ class Postfix{
 };
 
 int main(){
-    string str = "(A/(B-C)*D+E)";
+    string str = "(a/b+c/d-e*f)";
     Postfix pf = Postfix(str);
     pf.display();
     // ABC-/D*E+
